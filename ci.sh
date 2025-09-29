@@ -44,7 +44,7 @@ Releases() {
     # 分离kernel和dtb
     cp -f out/arch/arm64/boot/Image.lz4 ../AnyKernel3-${ANYKERNEL_HASH}/Image.lz4
     # 合并所有 dtb 文件，生成一个 dtb 文件
-    cat out/arch/arm64/boot/dts/*.dtb > ../AnyKernel3-${ANYKERNEL_HASH}/dtb
+    find out/arch/arm64/boot/dts/ -type f -name "*.dtb" -exec cat {} + > ../AnyKernel3-${ANYKERNEL_HASH}/dtb
 
     #一天可能提交编译多次
     #用生成的文件的MD5来区分每次生成的文件
