@@ -31,13 +31,17 @@ Initsystem() {
 Patch_dc() {
     #cp -R ../drivers/* ./drivers/
     # patch -p1 <../dc_patch/dc_patch.diff
-    grep -q CONFIG_FLICKER_FREE arch/arm64/configs/m1s1_defconfig || echo "CONFIG_FLICKER_FREE=y" >>arch/arm64/configs/m1s1_defconfig
+    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+    grep -q CONFIG_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
+    grep -q CONFIG_HAVE_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
+    grep -q CONFIG_KPROBE_EVENTS arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/m1s1_defconfig
+
 }
 Releases() {
     #path to ./kernel/
-    echo 'pwd' && pwd
-    find . -name Image.gz-dtb
-    cp -f out/arch/arm64/boot/Image.gz-dtb ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb
+    echo 'pwd path:' && pwd
+    find . -name "Image.*"
+    cp -f out/arch/arm64/boot/Image.lz4-dtb ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb
     #一天可能提交编译多次
     #用生成的文件的MD5来区分每次生成的文件
     md5=$(md5sum ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb)
