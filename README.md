@@ -127,8 +127,8 @@ make -j"$(nproc --all)" O=out \
 
 本项目开发中参考了许多开源项目/公开文档，非常感谢各位作者的付出，排名不分先后：
 
-* 内核代码：https://github.com/LineageOS/android_kernel_oneplus_msm8998
-* DC调光 ：https://github.com/lyq1996/android_kernel_oneplus_msm8998
+* 内核代码：https://github.com/LineageOS/android_kernel_google_marlin
+* DC调光 ：https://github.com/lyq1996/android_kernel_google_marlin
 * DC调光（优化）：https://github.com/TheNoFace/kernel_oneplus_msm8998/commit/6879c36c6a2c5d5b88d6b6dd64587990490bc8b6
 * 交叉编译（gcc）：https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9
 * 交叉编译（gcc）：https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9
