@@ -39,9 +39,13 @@ Patch_su() {
 }
 Releases() {
     #path to ./kernel/
-    echo 'pwd path:' && pwd
-    find . -name "Image.*"
     cp -f out/arch/arm64/boot/Image.lz4-dtb ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb
+
+    # 分离kernel和dtb
+    cp -f out/arch/arm64/boot/Image.lz4 ../AnyKernel3-${ANYKERNEL_HASH}/Image.lz4
+    # 合并所有 dtb 文件，生成一个 dtb 文件
+    cat out/arch/arm64/boot/dts/*.dtb > ../AnyKernel3-${ANYKERNEL_HASH}/dtb
+
     #一天可能提交编译多次
     #用生成的文件的MD5来区分每次生成的文件
     md5=$(md5sum ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb)
@@ -85,4 +89,4 @@ make -j"$(nproc --all)" O=out m1s1_defconfig \
     CROSS_COMPILE_ARM32=arm-linux-androideabi- \
     CLANG_TRIPLE=aarch64-linux-gnu- \
     LLVM=1 &&
-    Releases "sailfish") || (echo "dc build error" && exit 1)
+    Releases "sailfish") || (echo "su build error" && exit 1)
