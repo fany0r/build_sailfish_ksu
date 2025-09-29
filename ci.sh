@@ -28,7 +28,7 @@ Initsystem() {
 
 }
 
-Patch_dc() {
+Patch_su() {
     #cp -R ../drivers/* ./drivers/
     # patch -p1 <../dc_patch/dc_patch.diff
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
@@ -65,8 +65,8 @@ test -d releases || mkdir releases
 # ls -lh
 cd ./android_kernel_google_marlin-"${KERNEL_HASH}"/
 
-##dc patch
-# Patch_dc
+##su patch
+Patch_su
 #Write flag
 test -f localversion || touch localversion
 cat >localversion <<EOF
