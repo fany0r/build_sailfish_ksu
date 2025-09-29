@@ -2,10 +2,10 @@
 #for github actions
 set -eu
 if command -v sudo; then
-    sudo apt update
+    sudo apt-get update
 else
-    apt update
-    apt install -y sudo
+    apt-get update
+    apt-get install -y sudo
 fi
 source submodules.conf
 #submodules
@@ -35,6 +35,8 @@ Patch_dc() {
 }
 Releases() {
     #path to ./kernel/
+    echo 'pwd' && pwd
+    find . -name Image.gz-dtb
     cp -f out/arch/arm64/boot/Image.gz-dtb ../AnyKernel3-${ANYKERNEL_HASH}/Image.gz-dtb
     #一天可能提交编译多次
     #用生成的文件的MD5来区分每次生成的文件
@@ -56,11 +58,11 @@ cp "${GITHUB_WORKSPACE}"/anykernel.sh "${GITHUB_WORKSPACE}"/AnyKernel3-${ANYKERN
 
 Initsystem
 test -d releases || mkdir releases
-ls -lh
+# ls -lh
 cd ./android_kernel_google_marlin-"${KERNEL_HASH}"/
 
 ##dc patch
-Patch_dc
+# Patch_dc
 #Write flag
 test -f localversion || touch localversion
 cat >localversion <<EOF
