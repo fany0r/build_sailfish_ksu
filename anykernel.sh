@@ -4,16 +4,16 @@
 ### AnyKernel setup
 # global properties
 properties() { '
-kernel.string=oneplus5/5T lineageOS dc kernel by Seshiria @ GitHub
+kernel.string=Google Pixel(sailfish) lineageOS dc kernel by Seshiria @ GitHub
 do.devicecheck=1
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=cheeseburger
-device.name2=dumpling
-device.name3=OnePlus5
-device.name4=OnePlus5T
+device.name1=sailfish
+device.name2=Pixel
+device.name3=
+device.name4=
 supported.versions=15
 supported.patchlevels=
 supported.vendorpatchlevels=

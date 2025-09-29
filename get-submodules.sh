@@ -60,7 +60,7 @@ if [ ! -d "./AnyKernel3-${ANYKERNEL_HASH}" ]; then
     $UNZIP anykernel-$ANYKERNEL_HASH.zip
 fi
 # download kernel 
-if [ ! -d "./android_kernel_oneplus_msm8998-${KERNEL_HASH}" ]; then
+if [ ! -d "./android_kernel_google_marlin-${KERNEL_HASH}" ]; then
     echo "kernel is not installed, installing it"
     #download kernel and tar it
     DOWNLOADER $KERNEL_URL kernel-$KERNEL_HASH.zip
