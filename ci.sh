@@ -32,9 +32,7 @@ Patch_su() {
     #cp -R ../drivers/* ./drivers/
     patch -p1 < ../kernel_patch/fix-kernelsu.diff
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
-    grep -q CONFIG_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
-    grep -q CONFIG_HAVE_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
-    grep -q CONFIG_KPROBE_EVENTS arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/m1s1_defconfig
+    grep -q CONFIG_KSU arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KSU=y" >> arch/arm64/configs/m1s1_defconfig
 
 }
 Releases() {
