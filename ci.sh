@@ -30,7 +30,7 @@ Initsystem() {
 
 Patch_su() {
     #cp -R ../drivers/* ./drivers/
-    # patch -p1 <../dc_patch/dc_patch.diff
+    patch -p1 < ../kernel_patch/fix-kernelsu.diff
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
     grep -q CONFIG_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
     grep -q CONFIG_HAVE_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
@@ -44,7 +44,7 @@ Releases() {
     # 分离kernel和dtb
     cp -f out/arch/arm64/boot/Image.lz4 ../AnyKernel3-${ANYKERNEL_HASH}/Image.lz4
     # 合并所有 dtb 文件，生成一个 dtb 文件
-    find out/arch/arm64/boot/dts/ -type f -name "*.dtb" -exec cat {} + > ../AnyKernel3-${ANYKERNEL_HASH}/dtb
+    find out/arch/arm64/boot/dts/ -type f -name "*.dtb" -exec cat {} + > ../AnyKernel3-${ANYKERNEL_HASH}/kernel_dtb
 
     #一天可能提交编译多次
     #用生成的文件的MD5来区分每次生成的文件
