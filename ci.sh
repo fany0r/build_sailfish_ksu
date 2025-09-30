@@ -31,7 +31,7 @@ Initsystem() {
 Patch_su() {
     #cp -R ../drivers/* ./drivers/
     # patch -p1 <../dc_patch/dc_patch.diff
-    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+    curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
     grep -q CONFIG_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
     grep -q CONFIG_HAVE_KPROBES arch/arm64/configs/m1s1_defconfig || echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/m1s1_defconfig
     grep -q CONFIG_KPROBE_EVENTS arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/m1s1_defconfig
