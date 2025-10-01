@@ -30,7 +30,7 @@ Initsystem() {
 
 Patch_su() {
     #cp -R ../drivers/* ./drivers/
-    patch -p1 < ../kernel_patch/fix-kernelsu.diff
+    # patch -p1 < ../kernel_patch/fix-kernelsu.diff
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
     grep -q CONFIG_KSU arch/arm64/configs/m1s1_defconfig || echo "CONFIG_KSU=y" >> arch/arm64/configs/m1s1_defconfig
 
