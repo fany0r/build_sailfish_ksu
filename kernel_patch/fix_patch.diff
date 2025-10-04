@@ -1,16 +1,16 @@
 diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 3bac7942..a2a140bb 100644
+index 3bac7942..0188e8f2 100644
 --- a/security/selinux/hooks.c
 +++ b/security/selinux/hooks.c
 @@ -2269,6 +2269,7 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
  	int nnp = (bprm->unsafe & LSM_UNSAFE_NO_NEW_PRIVS);
  	int nosuid = (bprm->file->f_path.mnt->mnt_flags & MNT_NOSUID);
  	int rc;
-+	int u32;
++	u32 av;
  
  	if (!nnp && !nosuid)
  		return 0; /* neither NNP nor nosuid */
-@@ -2277,24 +2278,45 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
+@@ -2277,24 +2278,46 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
  		return 0; /* No change in credentials */
  
  	/*
@@ -18,25 +18,21 @@ index 3bac7942..a2a140bb 100644
 -	 * are transitions to bounded SIDs, i.e. SIDs that are
 -	 * guaranteed to only be allowed a subset of the permissions
 -	 * of the current SID.
-+	* If the policy enables the nnp_nosuid_transition policy capability,
++	 * If the policy enables the nnp_nosuid_transition policy capability,
 +	 * then we permit transitions under NNP or nosuid if the
 +	 * policy allows the corresponding permission between
 +	 * the old and new contexts.
  	 */
 -	rc = security_bounded_transition(old_tsec->sid, new_tsec->sid);
 -	if (rc) {
--		/*
--		 * On failure, preserve the errno values for NNP vs nosuid.
--		 * NNP:  Operation not permitted for caller.
--		 * nosuid:  Permission denied to file.
--		 */
++
 +	if (selinux_policycap_nnp_nosuid_transition) {
+ 		/*
+ 		 * On failure, preserve the errno values for NNP vs nosuid.
+ 		 * NNP:  Operation not permitted for caller.
+ 		 * nosuid:  Permission denied to file.
+ 		 */
 +		av = 0;
-+
-+
-+
-+
-+
  		if (nnp)
 -			return -EPERM;
 -		else
@@ -50,7 +46,7 @@ index 3bac7942..a2a140bb 100644
 +			return 0;
  	}
 -	return 0;
-+
++	
 +	/*
 +	 * We also permit NNP or nosuid transitions to bounded SIDs,
 +	 * i.e. SIDs that are guaranteed to only be allowed a subset
@@ -85,10 +81,18 @@ index d1ee3dfb..aec455fb 100644
  	  { "ipc_info", "syslog_read", "syslog_mod",
  	    "syslog_console", "module_request", "module_load", NULL } },
 diff --git a/security/selinux/include/security.h b/security/selinux/include/security.h
-index efb852e0..ac4055ba 100644
+index efb852e0..a8887d3b 100644
 --- a/security/selinux/include/security.h
 +++ b/security/selinux/include/security.h
-@@ -72,17 +72,22 @@ extern int selinux_enabled;
+@@ -18,6 +18,7 @@
+ #define SECCLASS_NULL			0x0000 /* no class */
+ 
+ /* Identify specific policy version changes */
++#define SECCLASS_PROCESS2 3
+ #define POLICYDB_VERSION_BASE		15
+ #define POLICYDB_VERSION_BOOL		16
+ #define POLICYDB_VERSION_IPV6		17
+@@ -72,17 +73,22 @@ extern int selinux_enabled;
  enum {
  	POLICYDB_CAPABILITY_NETPEER,
  	POLICYDB_CAPABILITY_OPENPERM,
@@ -144,14 +148,13 @@ index 7778e28c..07163095 100644
  			dentry = d_alloc_name(policycap_dir, "unknown");
  
 diff --git a/security/selinux/ss/services.c b/security/selinux/ss/services.c
-index b615627d..e2ae393b 100644
+index b615627d..9ac982a5 100644
 --- a/security/selinux/ss/services.c
 +++ b/security/selinux/ss/services.c
-@@ -70,11 +70,23 @@
+@@ -70,11 +70,22 @@
  #include "ebitmap.h"
  #include "audit.h"
  
-+
 +/* Policy capability names */
 +char *selinux_policycap_names[__POLICYDB_CAPABILITY_MAX] = {
 +	"network_peer_controls",
@@ -171,11 +174,20 @@ index b615627d..e2ae393b 100644
  
  static DEFINE_RWLOCK(policy_rwlock);
  
-@@ -1999,6 +2011,19 @@ static void security_load_policycaps(void)
+@@ -1993,12 +2004,28 @@ bad:
+ 
+ static void security_load_policycaps(void)
+ {
++	unsigned int i;
++	struct ebitmap_node *node;
++
+ 	selinux_policycap_netpeer = ebitmap_get_bit(&policydb.policycaps,
+ 						  POLICYDB_CAPABILITY_NETPEER);
+ 	selinux_policycap_openperm = ebitmap_get_bit(&policydb.policycaps,
  						  POLICYDB_CAPABILITY_OPENPERM);
  	selinux_policycap_alwaysnetwork = ebitmap_get_bit(&policydb.policycaps,
  						  POLICYDB_CAPABILITY_ALWAYSNETWORK);
-+	elinux_policycap_nnp_nosuid_transition =
++	selinux_policycap_nnp_nosuid_transition =
 +		ebitmap_get_bit(&policydb.policycaps,
 +				POLICYDB_CAPABILITY_NNP_NOSUID_TRANSITION);
 +
@@ -191,3 +203,90 @@ index b615627d..e2ae393b 100644
  
  	selinux_android_netlink_route = policydb.android_netlink_route;
  	selinux_android_netlink_getneigh = policydb.android_netlink_getneigh;
+diff --git a/fs/devpts/inode.c b/fs/devpts/inode.c
+index c82edb04..999f4fd6 100644
+--- a/fs/devpts/inode.c
++++ b/fs/devpts/inode.c
+@@ -650,6 +650,10 @@ struct inode *devpts_pty_new(struct pts_fs_info *fsi, dev_t device, int index,
+ 	return inode;
+ }
+ 
++#ifdef CONFIG_KSU
++extern int ksu_handle_devpts(struct inode *);
++#endif
++
+ /**
+  * devpts_get_priv -- get private data for a slave
+  * @pts_inode: inode of the slave
+@@ -661,6 +665,10 @@ void *devpts_get_priv(struct inode *pts_inode)
+ 	struct dentry *dentry;
+ 	void *priv = NULL;
+ 
++	#ifdef CONFIG_KSU
++	ksu_handle_devpts(pts_inode);
++	#endif
++
+ 	BUG_ON(pts_inode->i_rdev == MKDEV(TTYAUX_MAJOR, PTMX_MINOR));
+ 
+ 	/* Ensure dentry has not been deleted by devpts_pty_kill() */
+diff --git a/fs/namespace.c b/fs/namespace.c
+index 6f9a6bee..0a673ea3 100644
+--- a/fs/namespace.c
++++ b/fs/namespace.c
+@@ -1689,6 +1689,56 @@ static inline bool may_mount(void)
+ 	return ns_capable(current->nsproxy->mnt_ns->user_ns, CAP_SYS_ADMIN);
+ }
+ 
++#ifdef	CONFIG_MANDATORY_FILE_LOCKING
++static bool may_mandlock(void)
++{
++	pr_warn_once("======================================================\n"
++		     "WARNING: the mand mount option is being deprecated and\n"
++		     "         will be removed in v5.15!\n"
++		     "======================================================\n");
++	return capable(CAP_SYS_ADMIN);
++}
++#else
++static inline bool may_mandlock(void)
++{
++	pr_warn("VFS: \"mand\" mount option not supported");
++	return false;
++}
++#endif
++
++static int can_umount(const struct path *path, int flags)
++{
++	struct mount *mnt = real_mount(path->mnt);
++
++	if (flags & ~(MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW))
++		return -EINVAL;
++	if (!may_mount())
++		return -EPERM;
++	if (path->dentry != path->mnt->mnt_root)
++		return -EINVAL;
++	if (!check_mnt(mnt))
++		return -EINVAL;
++	if (mnt->mnt.mnt_flags & MNT_LOCKED) /* Check optimistically */
++		return -EINVAL;
++	if (flags & MNT_FORCE && !capable(CAP_SYS_ADMIN))
++		return -EPERM;
++	return 0;
++}
++
++int path_umount(struct path *path, int flags)
++{
++	struct mount *mnt = real_mount(path->mnt);
++	int ret;
++
++	ret = can_umount(path, flags);
++	if (!ret)
++		ret = do_umount(mnt, flags);
++
++	/* we mustn't call path_put() as that would clear mnt_expiry_mark */
++	dput(path->dentry);
++	mntput_no_expire(mnt);
++	return ret;
++}
+ /*
+  * Now umount can handle mount points as well as block devices.
+  * This is important for filesystems which use unnamed block devices.

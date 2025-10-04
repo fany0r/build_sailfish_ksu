@@ -50,7 +50,7 @@ ANYKERNEL_HASH=$ANYKERNEL_HASH
 ANYKERNEL_URL=https://github.com/osm0sis/AnyKernel3/archive/"\${ANYKERNEL_HASH}".zip
 #lineageos kernel
 KERNEL_HASH=$KERNEL_HASH
-KERNEL_URL=https://github.com/LineageOS/android_kernel_google_marlin/archive/"\${KERNEL_HASH}".zip
+KERNEL_URL=https://github.com/LineageOS/android_kernel_oneplus_msm8998/archive/"\${KERNEL_HASH}".zip
 EOF
 }
 
@@ -62,7 +62,7 @@ up_hash=$(get_hash "LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-andr
 compare_hash "ARM_GCC_HASH" "$up_hash"
 up_hash=$(get_hash "LineageOS/android_prebuilts_build-tools" "lineage-21.0")
 compare_hash "PREBUILTS_HASH" "$up_hash"
-up_hash=$(get_hash "LineageOS/android_kernel_google_marlin" "lineage-22.1")
+up_hash=$(get_hash "LineageOS/android_kernel_oneplus_msm8998" "lineage-22.1")
 compare_hash "KERNEL_HASH" "$up_hash"
 up_hash=$(get_hash "osm0sis/AnyKernel3" "master")
 compare_hash "ANYKERNEL_HASH" "$up_hash"

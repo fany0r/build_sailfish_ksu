@@ -11,11 +11,16 @@ jobs:
         run: |
           bash -x ./ci.sh
           cat ${GITHUB_WORKSPACE}/env.add >> $GITHUB_ENV
-      - name: Upload to Artifacts
+      - name: Upload kernel images
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: ${{ env.fliename }}
-          path: |
-                ${{ env.fliepath }}
-                !${{ env.fliepath }}/*/placeholder
+          name: ${{ env.filename1 }}
+          path: ${{ env.filepath1 }}
+
+      - name: Upload AnyKernel3 package
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: ${{ env.filename2 }}
+          path: ${{ env.filepath2 }}
+
           compression-level: 9
