@@ -30,7 +30,7 @@ Initsystem() {
 
 Patch_su() {
     # fix pm command/path_umount and KernelSU module activation issue/
-    patch -p1 < ../kernel_patch/fix-patch.diff
+    patch -p1 < ../kernel_patch/fix_patch.diff
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
     # use kprobe hook
     for config in CONFIG_KPROBES CONFIG_HAVE_KPROBES CONFIG_KPROBE_EVENTS; do
